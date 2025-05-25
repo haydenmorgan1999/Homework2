@@ -76,7 +76,7 @@ subset(df, df$diff_bp < 0)
 
 ### Question 3
 ```{r}
-normal <- ifelse(df$post_bp < 120, "TRUE", "")
+normal <- ifelse(df$post_bp < 120, "TRUE", "FALSE")
 
 df$normal <- normal
 
@@ -105,7 +105,7 @@ diff_bp <- pre_bp-post_bp
 
 bp_df_placebo <- data.frame(patient, pre_bp, post_bp, diff_bp)
 
-normal <- ifelse(bp_df_placebo$post_bp < 120, "TRUE", "")
+normal <- ifelse(bp_df_placebo$post_bp < 120, "TRUE", "FALSE")
 
 bp_df_placebo$normal <- normal
 
