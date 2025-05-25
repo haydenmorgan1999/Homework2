@@ -1,0 +1,206 @@
+---
+title: "Programming in Base R"
+format: pdf
+---
+## Task 1: Basic Vector practice
+### Question 1
+```{r}
+pre <- c(130, 128, 116, 124, 133, 134, 118, 126, 114, 127, 141, 138, 128, 
+            140, 137, 131, 120, 128, 139, 135)
+
+pre
+
+post <- c(114, 98, 113, 99, 107, 116, 113, 111, 119, 117, 101, 119, 130, 
+             122, 106, 106, 124, 102, 117, 113)
+
+post
+```
+
+### Question 2
+```{r}
+r_object <- paste("Subject", 1:20, sep = "_")
+
+r_object
+
+names(pre) <- r_object
+
+pre
+
+names(post) <- r_object
+
+post
+```
+
+### Question 3
+```{r}
+diff_op <- pre-post
+
+diff_op
+```
+
+### Question 4
+```{r}
+mean(diff_op)
+```
+
+### Question 5
+```{r}
+which(diff_op > 0)
+```
+
+### Question 6
+```{r}
+diff_op_pos <- diff_op[which(diff_op > 0)]
+
+diff_op_pos
+```
+
+### Question 7
+```{r}
+mean(diff_op_pos)
+```
+
+## Task 2: Basic Data Frame practice
+### Question 1
+```{r}
+df <- data.frame(patient = r_object, pre_bp = pre, post_bp = post, 
+                 diff_bp = diff_op)
+
+df
+```
+
+### Question 2
+```{r}
+subset(df, df$diff_bp < 0)
+```
+
+### Question 3
+```{r}
+normal <- ifelse(df$post_bp < 120, "TRUE", "")
+
+df$normal <- normal
+
+df$normal
+```
+
+### Question 4
+```{r}
+knitr::kable(df)
+```
+
+## Task 3: List practice
+### Question 1
+```{r}
+pre_bp <- c(138, 135, 147, 117, 152, 134, 114, 121, 131, 130) 
+
+post_bp <- c(105, 136, 123, 130, 134, 143, 135, 139, 120, 124)
+
+patient <- paste("Subject", 1:10, sep = "_")
+
+names(pre_bp) <- patient
+
+names(post_bp) <- patient
+
+diff_bp <- pre_bp-post_bp
+
+bp_df_placebo <- data.frame(patient, pre_bp, post_bp, diff_bp)
+
+normal <- ifelse(bp_df_placebo$post_bp < 120, "TRUE", "")
+
+bp_df_placebo$normal <- normal
+
+bp_df_placebo
+```
+
+### Question 2
+```{r}
+bp_list <- list(treatment = df, placebo = bp_df_placebo)
+
+bp_list
+```
+
+### Question 3
+```{r}
+bp_list[1]
+
+bp_list[[1]]
+
+bp_list$treatment
+```
+
+### Question 4
+```{r}
+bp_list$placebo$pre_bp
+```
+
+## Task 4: Control Flow Practice 
+### Question 1
+```{r}
+bp_list$treatment$status <- character(20)
+
+bp_list$placebo$status <- character(10)
+```
+
+### Question 2
+```{r}
+for(i in 1:20){
+  if(bp_list$treatment$post_bp[i] <= 120){
+     bp_list$treatment$status[i] <- "optimal"
+  } else if((bp_list$treatment$post_bp[i] > 120) & 
+            (bp_list$treatment$post_bp[i] <= 130)){
+     bp_list$treatment$status[i] <- "borderline"
+  } else if(bp_list$treatment$post_bp[i] > 130){
+     bp_list$treatment$status[i] <- "high"
+  }
+}
+
+bp_list$treatment$status
+```
+
+### Question 3
+```{r}
+for(i in 1:10){
+  if(bp_list$placebo$post_bp[i] <= 120){
+    bp_list$placebo$status[i] <- "optimal"
+  } else if((bp_list$placebo$post_bp[i] > 120) & 
+            (bp_list$placebo$post_bp[i] <= 130)){
+    bp_list$placebo$status[i] <- "borderline"
+  } else if(bp_list$placebo$post_bp[i] > 130){
+    bp_list$placebo$status[i] <- "high"
+  }
+}
+
+bp_list$placebo$status
+```
+
+## Task 5: Function Writing 
+### Question 1
+```{r}
+returning_six_values <- function(treatment, placebo, stat = "mean"){
+  my_fun <- get(stat)
+  
+  vector_names <- c("of Pre-BP (Treatment)", "of Post-BP (Treatment)", 
+                    "of BP Difference (Treatment)", "of Pre-BP (Placebo)", 
+                    "of Post-BP (Placebo)", "of BP Difference (Placebo)")
+  
+  vector_names <- paste(stat, vector_names)
+    
+  vector_values <- c(my_fun(treatment$pre_bp), my_fun(treatment$post_bp), 
+                     my_fun(treatment$diff_bp), my_fun(placebo$pre_bp), 
+                     my_fun(placebo$post_bp), my_fun(placebo$diff_bp))
+  
+  names(vector_values) <- vector_names
+    
+  return(vector_values)
+}
+
+returning_six_values(bp_list$treatment, bp_list$placebo)
+
+returning_six_values(bp_list$treatment, bp_list$placebo, "var")
+
+returning_six_values(bp_list$treatment, bp_list$placebo, "sd")
+
+returning_six_values(bp_list$treatment, bp_list$placebo, "min")
+
+returning_six_values(bp_list$treatment, bp_list$placebo, "max")
+```
